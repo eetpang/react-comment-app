@@ -9,7 +9,9 @@ class CommentInput extends Component {
       content: ''
     }
   }
-
+  componentWillMount() {
+    this._loadUsername()
+  }
   componentDidMount(){
     this.input.focus()
   }
@@ -32,7 +34,8 @@ class CommentInput extends Component {
       if (this.state.username && this.state.content) {
         this.props.onSubmit({
           username: this.state.username,
-          content: this.state.content
+          content: this.state.content,
+          createdTime: +new Date()
         })}
       else {
         window.alert('Please enter user name and content')
@@ -41,19 +44,35 @@ class CommentInput extends Component {
     this.setState({ content: '' })
   }
 
+  handleUsernameBlur = (e) => {
+    this._saveUsername(e.target.value)
+  }
+
+  _saveUsername(username) {
+    localStorage.setItem('username', username)
+  }
+
+  _loadUsername() {
+    const username = localStorage.getItem('username')
+    if (username) {
+      this.setState({ username })
+    }
+  }
+
   render() {
     return (
       <div className='comment-input'>
         <div className='comment-field'>
-          <span className='comment-field-name'>用户名：</span>
+          <span className='comment-field-name'>User Name：</span>
           <div className='comment-field-input'>
             <input
               value={this.state.username}
-              onChange={this.handleUsernameChange} />
+              onChange={this.handleUsernameChange}
+              onBlur={this.handleUsernameBlur}/>
           </div>
         </div>
         <div className='comment-field'>
-          <span className='comment-field-name'>评论内容：</span>
+          <span className='comment-field-name'>Comment：</span>
           <div className='comment-field-input'>
             <textarea ref={(target) => this.input = target}
               value={this.state.content}
@@ -62,7 +81,7 @@ class CommentInput extends Component {
         </div>
         <div className='comment-field-button'>
           <button onClick={this.handleSubmit}>
-            发布
+            Submit
           </button>
         </div>
       </div>
